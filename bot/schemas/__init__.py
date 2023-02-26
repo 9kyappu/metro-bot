@@ -4,5 +4,5 @@ from .station import StationModel
 
 
 __all__ = (
-    StationModel
+    StationModel,
 )
