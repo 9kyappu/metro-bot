@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from .station import SearchedStation
+from .station import StationModel
 
 
 __all__ = (
-    SearchedStation
+    StationModel
 )

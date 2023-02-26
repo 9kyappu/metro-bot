@@ -2,7 +2,7 @@
 
 from typing import List
 
-from schemas import SearchedStation
+from schemas import StationModel
 from .queries import StationQuery
 from .sqlite_db import SqliteDb
 
@@ -10,14 +10,14 @@ from .sqlite_db import SqliteDb
 class MetroController:
     def __init__(self, db: SqliteDb):
         self._db = db
-        self._metro_names = {}
+        self._city_names = {}
         self._metro = {}
         self._stations = {}
         self._all_data = {}
 
     async def init_metro(self, city_ids: List[str]):
         for city_id in city_ids:
-            self._metro_names[city_id] = (await self._db.execute(
+            self._city_names[city_id] = (await self._db.execute(
                 query=StationQuery.GET_CITY_DATA,
                 parameters=(city_id, )
             ))[0][1]
@@ -44,21 +44,21 @@ class MetroController:
     async def search_stations(
             self,
             text: str,
-            city_id: str) -> List[SearchedStation]:
+            city_id: str) -> List[StationModel]:
         response = await self._db.execute(
             query=StationQuery.SEARCH_STATION,
             parameters=(city_id, f"%{text}%")
         )
 
         return [
-            SearchedStation(
+            StationModel(
                 station_id=station[0],
                 name=station[2]
             ) for station in response
         ]
 
     async def get_city_name(self, city_id: str) -> str:
-        return self._metro_names.get(city_id)
+        return self._city_names.get(city_id)
 
     async def get_station_name(
             self,

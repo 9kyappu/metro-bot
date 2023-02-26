@@ -3,6 +3,6 @@
 from pydantic import BaseModel
 
 
-class SearchedStation(BaseModel):
+class StationModel(BaseModel):
     station_id: int
     name: str
