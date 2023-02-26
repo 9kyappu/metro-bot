@@ -53,14 +53,15 @@ class MetroController:
         return [
             StationModel(
                 station_id=station[0],
-                name=station[2]
+                line_id=station[2],
+                name=station[3]
             ) for station in response
         ]
 
     async def get_city_name(self, city_id: str) -> str:
         return self._city_names.get(city_id)
 
-    async def get_station_name(
+    async def get_station_data(
             self,
             station_id: int,
             city_id: str) -> str:
@@ -68,5 +69,9 @@ class MetroController:
 
     def _generate_metro(self, stations: List[tuple]) -> dict:
         return {
-            station_id: name for station_id, _, name in stations
+            station_id: StationModel(
+                station_id=station_id,
+                line_id=line_id,
+                name=name
+            ) for station_id, city_id, line_id, name in stations
         }

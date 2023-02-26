@@ -132,17 +132,17 @@ async def search_station(client: Client, message: Message):
 @APP.on_callback_query(regex_filter(r"set_station:\d+:\d+"))  # set_station:{city_id}:{station_id}
 async def set_station_callback(client: Client, callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
-    first_station = ""
 
     _, city_id, station_id = callback_query.data.split(":")
 
-    station_name = await METRO_CONTROLLER.get_station_name(
+    second_station_data = await METRO_CONTROLLER.get_station_data(
         station_id=int(station_id),
         city_id=city_id
     )
+    second_station_id = second_station_data.station_id
 
     try:
-        first_station = STATE_MANAGER.get_state_data(
+        first_station_id = STATE_MANAGER.get_state_data(
             state_id=user_id,
             state_data_name="first_station"
         )
@@ -166,20 +166,14 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
 
     STATE_MANAGER.del_state(state_id=user_id)
 
-    first_station_name = await METRO_CONTROLLER.get_station_name(
-        station_id=int(first_station),
-        city_id=city_id
-    )
-    first_station_name = first_station_name.title()
-    second_station_name = station_name.title()
     await callback_query.message.delete()
 
+    first_station_id = int(first_station_id)
     nodes = []
-    all_data = []
 
-    pizda = await METRO_CONTROLLER.get_nodes(city_id=city_id)
-    for row in pizda:
-        nodes.append((row[2]).title())
+    all_nodes = await METRO_CONTROLLER.get_nodes(city_id=city_id)
+    for row in all_nodes:
+        nodes.append(row[0])
 
     init_graph = {}
     for node in nodes:
@@ -187,26 +181,40 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
 
     all_data = await METRO_CONTROLLER.get_all_data(city_id=city_id)
     for row in all_data:
-        init_graph[row[2].title()][row[3].title()] = row[4]
+        init_graph[row[2]][row[3]] = row[4]
 
     graph = Graph(nodes, init_graph)
+
     previous_nodes, shortest_path = dijkstra_algorithm(
-        graph=graph, start_node=first_station_name
+        graph=graph, start_node=first_station_id
     )
 
+    result = []
     path = []
-    point = second_station_name
-    while point != first_station_name:
-        path.append(point)
-        point = previous_nodes[point]
-    path.append(first_station_name)
+    node = second_station_id
+    while node != first_station_id:
+        path.append(node)
+        node = previous_nodes[node]
+    path.append(first_station_id)
 
+    last_station_name = None
+    last_line_id = None
+    for station_id in path:
+        station = await METRO_CONTROLLER.get_station_data(station_id, "2")
+        if last_line_id != station.line_id:
+            result.append(last_station_name)
+            result.append(station.name.title())
+            last_line_id = station.line_id
+        last_station_name = station.name.title()
+
+    last_station = await METRO_CONTROLLER.get_station_data(path[-1], "2")
+    result.append(last_station.name.title())
     example = (
-        "Найден лучший маршрут в {} минут.\n".format(shortest_path[second_station_name]) +
-        " → ".join(reversed(path))
-        )
+        "Найден лучший маршрут в {} минут.\n\n".format(shortest_path[second_station_id]//60) +
+        "\n ⬇️ \n".join(reversed(result[1:]))
+    )
 
-    if first_station_name != second_station_name:
+    if first_station_id != second_station_id:
         await APP.send_message(
             chat_id=user_id,
             text=example
@@ -217,7 +225,7 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
             text=UserCommand.END_TEXT,
             reply_markup=Keyboards.END_KEYBOARD
         )
-    elif first_station_name == second_station_name:
+    elif first_station_id == second_station_id:
         await APP.send_message(
             chat_id=user_id,
             text=UserCommand.EXCEPTION_TEXT,
