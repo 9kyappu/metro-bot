@@ -61,29 +61,37 @@ c = db.cursor()
         # db.commit()
         # db.close()
 
-# station1 = []
-# station2 = []
-# for i in range(0, 76):
-#     res = c.execute("SELECT station1, station2, move_time FROM way")
-#     station1.append((res.fetchall()[i])[0])
-# for i in range(0, 76):
-#     res = c.execute("SELECT station1, station2, move_time FROM way")
-#     station2.append((res.fetchall()[i])[1])
+station1 = []
+station2 = []
+for i in range(0, 76):
+    res = c.execute("SELECT station1, station2, move_time FROM way")
+    station1.append((res.fetchall()[i])[0])
+for i in range(0, 76):
+    res = c.execute("SELECT station1, station2, move_time FROM way")
+    station2.append((res.fetchall()[i])[1])
 
-# station2_id = []
-# station1_id = []
-# for hui, penis in zip(station1, station2):
-#     row = c.execute("SELECT id FROM station WHERE name LIKE ?", (hui, ))
-#     station1_id.append(row.fetchone()[0] + 366)
-#     row2 = c.execute("SELECT id FROM station WHERE name LIKE ?", (penis, ))
-#     station2_id.append(row2.fetchone()[0] + 366)
+station2_id = []
+station1_id = []
+for hui, penis in zip(station1, station2):
+    row = c.execute("SELECT id FROM station WHERE name LIKE ?", (hui, ))
+    station1_id.append(row.fetchone()[0] + 366)
+    row2 = c.execute("SELECT id FROM station WHERE name LIKE ?", (penis, ))
+    station2_id.append(row2.fetchone()[0] + 366)
 
-res = c.execute("SELECT * FROM station")
-stations_list = res.fetchall()
+move_time = []
+for i in range(0, 76):
+    res = c.execute("SELECT station1, station2, move_time FROM way")
+    move_time.append((res.fetchall()[i])[2] * 60)
 
-stations = []
-for station in stations_list:
-    stations.append(station[2])
+graph = {}
+for s1, s2, mt in zip(station1_id, station2_id, move_time):
+    print(s1, s2, mt)
+# res = c.execute("SELECT * FROM station")
+# stations_list = res.fetchall()
+
+# stations = []
+# for station in stations_list:
+#     stations.append(station[2])
 
 
 # line_id = [[25], [25], [25], [22], [25], [21], [25], [23], [23], [22], [23], [21], [23], [24], [23], [22], [24], [22], [21], [22], [21], [21],
@@ -91,10 +99,10 @@ for station in stations_list:
 #            [21], [21], [21], [21], [21], [21], [21], [25], [25], [25], [25], [25], [25], [23], [23], [23], [23], [22], [22], [22], [22], [22],
 #            [22], [21], [21], [21], [21], [21]]
 
-line_id = [25, 25, 25, 22, 25, 21, 25, 23, 23, 22, 23, 21, 23, 24, 23, 22, 24, 22, 21, 22, 21, 21,
-           21, 24, 24, 24, 25, 25, 25, 25, 24, 24, 24, 23, 23, 23, 22, 22, 22, 22, 22, 22, 22, 21,
-           21, 21, 21, 21, 21, 21, 21, 25, 25, 25, 25, 25, 25, 23, 23, 23, 23, 22, 22, 22, 22, 22,
-           22, 21, 21, 21, 21, 21]
+# line_id = [25, 25, 25, 22, 25, 21, 25, 23, 23, 22, 23, 21, 23, 24, 23, 22, 24, 22, 21, 22, 21, 21,
+#            21, 24, 24, 24, 25, 25, 25, 25, 24, 24, 24, 23, 23, 23, 22, 22, 22, 22, 22, 22, 22, 21,
+#            21, 21, 21, 21, 21, 21, 21, 25, 25, 25, 25, 25, 25, 23, 23, 23, 23, 22, 22, 22, 22, 22,
+#            22, 21, 21, 21, 21, 21]
 
 # c.executemany("INSERT INTO station(city_id, name) VALUES (1, ?)",  (nodes))
 # c.execute("INSERT INTO user VALUES (762633572, NULL, '2019-01-12')")
@@ -117,9 +125,9 @@ c = db.cursor()
 #     graph = {line: nodes}
     # print(graph)
 
-c.executemany(
-    "INSERT INTO station(city_id, line_id, name) VALUES (1, ?, ?)",  (zip(line_id, stations))
-)
+# c.executemany(
+#     "INSERT INTO way(city_id, station1, station2, move_time) VALUES (1, ?, ?, ?)",  (zip(station1_id, station2_id, move_time))
+# )
 
 # c.executemany("INSERT INTO station(city_id, line_id, name) VALUES (1, ?, ?)",  (line, nodes ))
 db.commit()

@@ -101,7 +101,6 @@ async def search_station(client: Client, message: Message):
         )
     except (StateNotFound, StateDataNotFound):
         pass  # TODO сделать исключение
-        await message.delete()
         return
 
     text = message.text.lower()
@@ -112,7 +111,6 @@ async def search_station(client: Client, message: Message):
         await message.reply(
             text=UserCommand.STATION_NOT_FOUND_TEXT.format(text=text)
         )
-        await message.delete()
         return
 
     await message.reply(
@@ -126,7 +124,6 @@ async def search_station(client: Client, message: Message):
             ]
         )
     )
-    await message.delete()
 
 
 @APP.on_callback_query(regex_filter(r"set_station:\d+:\d+"))  # set_station:{city_id}:{station_id}
@@ -192,22 +189,28 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
     result = []
     path = []
     node = second_station_id
-    while node != first_station_id:
-        path.append(node)
-        node = previous_nodes[node]
-    path.append(first_station_id)
-
+    try:
+        while node != first_station_id:
+            path.append(node)
+            node = previous_nodes[node]
+        path.append(first_station_id)
+    except (KeyError):
+        await APP.send_message(
+            chat_id=user_id,
+            text=UserCommand.STATION_ERROR_TEXT,
+            reply_markup=Keyboards.ERROR_KEYBOARD
+        )
     last_station_name = None
     last_line_id = None
     for station_id in path:
-        station = await METRO_CONTROLLER.get_station_data(station_id, "2")
+        station = await METRO_CONTROLLER.get_station_data(station_id, city_id)
         if last_line_id != station.line_id:
             result.append(last_station_name)
             result.append(station.name.title())
             last_line_id = station.line_id
         last_station_name = station.name.title()
 
-    last_station = await METRO_CONTROLLER.get_station_data(path[-1], "2")
+    last_station = await METRO_CONTROLLER.get_station_data(path[-1], city_id)
     result.append(last_station.name.title())
     example = (
         "Найден лучший маршрут в {} минут.\n\n".format(shortest_path[second_station_id]//60) +
