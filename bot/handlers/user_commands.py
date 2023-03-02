@@ -9,6 +9,7 @@ from pyrogram.types import (
 
 from utils.dijkstra_algorithm import dijkstra_algorithm
 from utils.dijkstra_algorithm import Graph
+from core import SPB_MAP, MOSCOW_MAP
 from core.app import APP, METRO_CONTROLLER, STATE_MANAGER, USER_CONTROLLER
 from utils.state_manager import StateNotFound, StateDataNotFound
 from static.keyboards import Keyboards
@@ -234,3 +235,27 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
             text=UserCommand.EXCEPTION_TEXT,
             reply_markup=Keyboards.ERROR_KEYBOARD
         )
+
+
+@APP.on_callback_query(regex_filter("metro_map"))
+async def metro_map_callback(client: Client, callback_query: CallbackQuery):
+    user_id = callback_query.from_user.id
+    city_id = await USER_CONTROLLER.search_city(user_id=user_id, )
+    await callback_query.edit_message_text(
+        text="Хорошей поездки!"
+    )
+    if city_id == 1:
+        await APP.send_photo(
+            chat_id=user_id,
+            photo=SPB_MAP
+        )
+    elif city_id == 2:
+        await APP.send_photo(
+            chat_id=user_id,
+            photo=MOSCOW_MAP
+        )
+    await APP.send_message(
+        chat_id=user_id,
+        text=UserCommand.MENU_TEXT,
+        reply_markup=Keyboards.MENU_KEYBOARD
+    )

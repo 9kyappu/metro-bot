@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 class UserCommand:
     START_TEXT = (
         "  Привет, <i>{first_name}</i> 👋\n\n"

@@ -9,4 +9,6 @@ load_dotenv(find_dotenv())
 
 APP_NAME = getenv("APP_NAME")
 SQLITE_FILE = getenv("SQLITE_FILE")
+SPB_MAP = getenv("SPB_MAP")
+MOSCOW_MAP = getenv("MOSCOW_MAP")
 CITY_IDS = json_loads(getenv("CITY_IDS"))  # Example: ["1", "2"]
