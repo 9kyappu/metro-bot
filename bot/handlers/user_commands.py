@@ -95,14 +95,10 @@ async def way_callback(client: Client, callback_query: CallbackQuery):
 async def search_station(client: Client, message: Message):
     user_id = message.from_user.id
 
-    try:
-        city_id = STATE_MANAGER.get_state_data(
-            state_id=user_id,
-            state_data_name="city"
-        )
-    except (StateNotFound, StateDataNotFound):
-        pass  # TODO сделать исключение
-        return
+    city_id = STATE_MANAGER.get_state_data(
+        state_id=user_id,
+        state_data_name="city"
+    )
 
     text = message.text.lower()
 
@@ -145,7 +141,11 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
             state_data_name="first_station"
         )
     except StateNotFound:
-        pass  # TODO сделать исключение
+        await APP.send_message(
+            chat_id=user_id,
+            text=UserCommand.STATION_ERROR_TEXT,
+            reply_markup=Keyboards.ERROR_KEYBOARD
+        )
         return
     except StateDataNotFound:
         STATE_MANAGER.set_state_data(
@@ -215,7 +215,8 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
     result.append(last_station.name.title())
     example = (
         "Найден лучший маршрут в {} минут.\n\n".format(shortest_path[second_station_id]//60) +
-        "\n ⬇️ \n".join(reversed(result[1:]))
+        "\n ⬇️ \n".join(reversed(result[1:])) +
+        "\n\n ❗️ Для экономии места в сообщении обозначены только <i>пересадки</i>, без <i>промежуточных станций</i>"
     )
 
     if first_station_id != second_station_id:
@@ -242,7 +243,7 @@ async def metro_map_callback(client: Client, callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
     city_id = await USER_CONTROLLER.search_city(user_id=user_id, )
     await callback_query.edit_message_text(
-        text="Хорошей поездки!"
+        text="Хорошей поездки! ❤"
     )
     if city_id == 1:
         await APP.send_photo(
