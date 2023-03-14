@@ -213,10 +213,20 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
 
     last_station = await METRO_CONTROLLER.get_station_data(path[-1], city_id)
     result.append(last_station.name.title())
+
+    route_text = ""
+    for idx, station in enumerate(result[:0:-1]):
+        route_text += "%s\n%s\n" % (
+            station,
+            "🚶" if (idx + 1) % 2 == 0 else "⬇️"
+        )
+
+    route_time = shortest_path[second_station_id]//60
+
     example = (
-        "Найден лучший маршрут в {} минут.\n\n".format(shortest_path[second_station_id]//60) +
-        "\n ⬇️ \n".join(reversed(result[1:])) +
-        "\n\n ❗️ Для экономии места в сообщении обозначены только <i>пересадки</i>, без <i>промежуточных станций</i>"
+        f"Найден лучший маршрут в {route_time} минут\n\n"
+        f"{route_text[:-2]}\n\n"
+        " 🚶 <i>означает пересадку</i>"
     )
 
     if first_station_id != second_station_id:
