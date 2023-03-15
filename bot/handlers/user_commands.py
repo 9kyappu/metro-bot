@@ -95,10 +95,14 @@ async def way_callback(client: Client, callback_query: CallbackQuery):
 async def search_station(client: Client, message: Message):
     user_id = message.from_user.id
 
-    city_id = STATE_MANAGER.get_state_data(
-        state_id=user_id,
-        state_data_name="city"
-    )
+    try:
+        city_id = STATE_MANAGER.get_state_data(
+            state_id=user_id,
+            state_data_name="city"
+        )
+    except (StateNotFound, StateDataNotFound):
+        pass
+        return
 
     text = message.text.lower()
 
