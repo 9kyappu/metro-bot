@@ -34,6 +34,14 @@ async def start_command(client: Client, message: Message):
             )
 
 
+@APP.on_message(filters.command("users"))
+async def users_command(client: Client, message: Message):
+    count_of_users = await USER_CONTROLLER.users_count()
+    await message.reply(
+        text=UserCommand.USER_TEXT.format(count=count_of_users)
+    )
+
+
 @APP.on_callback_query(regex_filter("menu"))
 async def products_callback(client: Client, callback_query: CallbackQuery):
     await callback_query.edit_message_text(

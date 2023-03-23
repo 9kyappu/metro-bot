@@ -12,3 +12,4 @@ class UserQuery:
     INSERT_USER = "INSERT INTO user (user_id, auth_date) VALUES (?, ?)"
     INSERT_CITY = "UPDATE user SET city_id = ? WHERE user_id = ?"
     GET_USER_DATA = "SELECT * FROM user WHERE user_id = ?"
+    GET_USERS = "SELECT count(user_id) FROM user"

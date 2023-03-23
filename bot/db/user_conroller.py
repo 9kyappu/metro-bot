@@ -36,3 +36,10 @@ class UserController:
             return
         except (Exception):
             pass
+
+    async def users_count(self):
+        count_of_users = await self._db.execute(
+            query=UserQuery.GET_USERS,
+            parameters=None
+        )
+        return count_of_users[0]
