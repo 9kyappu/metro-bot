@@ -116,6 +116,14 @@ async def search_station(client: Client, message: Message):
 
     searched_stations = await METRO_CONTROLLER.search_stations(text=text, city_id=city_id)
 
+    line_ids = []
+    for station_line_id in searched_stations:
+        line_ids.append(station_line_id.line_id)
+
+    line_names = []
+    for line_id in line_ids:
+        line_names.append(await METRO_CONTROLLER.get_line_name(line_id=str(line_id)))
+
     if searched_stations == []:
         await message.reply(
             text=UserCommand.STATION_NOT_FOUND_TEXT.format(text=text)
@@ -127,9 +135,9 @@ async def search_station(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(
-                    text=station.name.title(),
+                    text=f"{station.name.title()} ({line_name[0]})",
                     callback_data=f"set_station:{city_id}:{station.station_id}"
-                )] for station in searched_stations
+                )] for station, line_name in zip(searched_stations, line_names)
             ]
         )
     )
