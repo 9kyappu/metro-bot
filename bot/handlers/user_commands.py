@@ -243,7 +243,7 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
 
     route_time = shortest_path[second_station_id]//60
 
-    example = (
+    final_text = (
         f"Найден лучший маршрут в {route_time} минут\n\n"
         f"{route_text[:-2]}\n\n"
         " 🚶 <i>означает пересадку</i>"
@@ -252,7 +252,7 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
     if first_station_id != second_station_id:
         await APP.send_message(
             chat_id=user_id,
-            text=example
+            text=final_text
         )
 
         await APP.send_message(
