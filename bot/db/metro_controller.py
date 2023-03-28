@@ -58,12 +58,12 @@ class MetroController:
             ) for station in response
         ]
 
-    async def get_line_name(self, line_id):
-        line_name = await self._db.execute(
+    async def get_line_color(self, line_id):
+        line_color = await self._db.execute(
             query=StationQuery.GET_LINES,
             parameters=(line_id, )
         )
-        return line_name[0]
+        return line_color[0]
 
     async def get_city_name(self, city_id: str) -> str:
         return self._city_names.get(city_id)

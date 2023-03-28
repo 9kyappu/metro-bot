@@ -6,7 +6,7 @@ class StationQuery:
     GET_CITY_METRO = "SELECT * FROM station WHERE city_id = ?"
     SEARCH_STATION = f"{GET_CITY_METRO} AND name LIKE ?"
     GET_ALL_DATA = "SELECT * FROM way WHERE city_id = ?"
-    GET_LINES = "SELECT name FROM line WHERE id = ?"
+    GET_LINES = "SELECT line_color FROM line WHERE id = ?"
 
 
 class UserQuery:

@@ -120,9 +120,9 @@ async def search_station(client: Client, message: Message):
     for station_line_id in searched_stations:
         line_ids.append(station_line_id.line_id)
 
-    line_names = []
+    line_colors = []
     for line_id in line_ids:
-        line_names.append(await METRO_CONTROLLER.get_line_name(line_id=str(line_id)))
+        line_colors.append(await METRO_CONTROLLER.get_line_color(line_id=str(line_id)))
 
     if searched_stations == []:
         await message.reply(
@@ -135,9 +135,9 @@ async def search_station(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(
-                    text=f"{station.name.title()} ({line_name[0]})",
+                    text=f"{station.name.title()} ({line_color[0]})",
                     callback_data=f"set_station:{city_id}:{station.station_id}"
-                )] for station, line_name in zip(searched_stations, line_names)
+                )] for station, line_color in zip(searched_stations, line_colors)
             ]
         )
     )
@@ -239,14 +239,14 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
     result.append(last_station.name.title())
     result_line_id.append(last_line_id)
 
-    result_line_names = []
+    result_line_colors = []
     for line_id in result_line_id:
-        result_line_names.append(await METRO_CONTROLLER.get_line_name(line_id=str(line_id)))
+        result_line_colors.append(await METRO_CONTROLLER.get_line_color(line_id=str(line_id)))
 
     route_text = ""
-    for id_and_station, line_name in zip(enumerate(result[:0:-1]), result_line_names[::-1]):
+    for id_and_station, line_color in zip(enumerate(result[:0:-1]), result_line_colors[::-1]):
         route_text += "%s\n%s\n" % (
-            id_and_station[1] + f" ({line_name[0]})",
+            id_and_station[1] + f" ({line_color[0]})",
             "🚶" if (id_and_station[0] + 1) % 2 == 0 else "⬇️"
         )
 
