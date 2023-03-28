@@ -206,7 +206,7 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
     previous_nodes, shortest_path = dijkstra_algorithm(
         graph=graph, start_node=first_station_id
     )
-
+    result_line_id = []
     result = []
     path = []
     node = second_station_id
@@ -227,18 +227,27 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
         station = await METRO_CONTROLLER.get_station_data(station_id, city_id)
         if last_line_id != station.line_id:
             result.append(last_station_name)
+            if last_line_id is not None:
+                result_line_id.append(last_line_id)
             result.append(station.name.title())
+            result_line_id.append(station.line_id)
             last_line_id = station.line_id
         last_station_name = station.name.title()
 
     last_station = await METRO_CONTROLLER.get_station_data(path[-1], city_id)
+
     result.append(last_station.name.title())
+    result_line_id.append(last_line_id)
+
+    result_line_names = []
+    for line_id in result_line_id:
+        result_line_names.append(await METRO_CONTROLLER.get_line_name(line_id=str(line_id)))
 
     route_text = ""
-    for idx, station in enumerate(result[:0:-1]):
+    for id_and_station, line_name in zip(enumerate(result[:0:-1]), result_line_names[::-1]):
         route_text += "%s\n%s\n" % (
-            station,
-            "🚶" if (idx + 1) % 2 == 0 else "⬇️"
+            id_and_station[1] + f" ({line_name[0]})",
+            "🚶" if (id_and_station[0] + 1) % 2 == 0 else "⬇️"
         )
 
     route_time = shortest_path[second_station_id]//60
