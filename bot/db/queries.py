@@ -4,7 +4,7 @@
 class StationQuery:
     GET_CITY_DATA = "SELECT * FROM city WHERE id = ?"
     GET_CITY_METRO = "SELECT * FROM station WHERE city_id = ?"
-    SEARCH_STATION = f"{GET_CITY_METRO} AND name LIKE ?"
+    SEARCH_STATION = f"{GET_CITY_METRO} AND name LIKE ? limit 12--"
     GET_ALL_DATA = "SELECT * FROM way WHERE city_id = ?"
     GET_LINES = "SELECT line_color FROM line WHERE id = ?"
 
