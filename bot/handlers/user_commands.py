@@ -242,6 +242,11 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
     result_line_colors = []
     for line_id in result_line_id:
         result_line_colors.append(await METRO_CONTROLLER.get_line_color(line_id=str(line_id)))
+    print(result)
+    if result[1] == result[2] and result[1] == result[3]:
+        result.pop(1)
+        result_line_colors.pop(1)
+    print(result)
 
     route_text = ""
     for id_and_station, line_color in zip(enumerate(result[:0:-1]), result_line_colors[::-1]):
@@ -250,6 +255,7 @@ async def set_station_callback(client: Client, callback_query: CallbackQuery):
             "🚶" if (id_and_station[0] + 1) % 2 == 0 else "⬇️"
         )
 
+    route_text = route_text[:-1]
     route_time = shortest_path[second_station_id]//60
 
     final_text = (
