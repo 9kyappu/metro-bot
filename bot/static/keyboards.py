@@ -90,7 +90,7 @@ class Keyboards:
             [
                 InlineKeyboardButton(
                     text="👤 Администратор",
-                    url="https://t.me/rarseniy"
+                    url="https://t.me/kingloh"
                 ),
                 InlineKeyboardButton(
                     text="🔃 Смена города",
